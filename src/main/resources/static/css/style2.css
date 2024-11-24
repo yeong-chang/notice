@@ -1,0 +1,124 @@
+/* 기본 설정 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+}
+
+/* 헤더 스타일 */
+.header {
+    background-color: #2C3E50;
+    color: white;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-list li {
+    margin: 0 20px;
+}
+
+.nav-list a {
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-list a:hover {
+    background-color: #2980B9;
+    transform: scale(1.1);
+}
+
+/* 메인 콘텐츠와 사이드바를 포함하는 컨테이너 */
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+    gap: 20px;
+}
+
+/* 사이드바 스타일 */
+/* 더 높은 우선순위로 설정 */
+.sidebar {
+    background-color: #34495E !important;
+}
+
+.sidebar {
+    width: 25%;
+    background-color: #34495E;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-box {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-box h4 {
+    font-size: 18px;
+    color: #2C3E50;
+    margin-bottom: 10px;
+}
+
+.sidebar-box p {
+    font-size: 14px;
+    color: #7F8C8D;
+}
+
+/* 메인 콘텐츠 스타일 */
+.content {
+    width: 70%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    font-size: 28px;
+    color: #2C3E50;
+}
+
+/* 푸터 스타일 */
+.footer {
+    background-color: #2C3E50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .content {
+        width: 100%;
+    }
+}

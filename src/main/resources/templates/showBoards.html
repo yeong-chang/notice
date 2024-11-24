@@ -3,12 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>게시판</title>
-    <!-- CSS 파일 링크 -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- 두 번째 CSS 파일 -->
+    <link rel="stylesheet" th:href="@{/css/style2.css}">
 </head>
 <body>
-<h1 class="page-title">게시물 목록</h1>
+<!-- 헤더 포함 -->
+<!-- 헤더 -->
+<th:block th:fragment="header">
+    <header class="header">
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/user">사용자</a></li>
+                <li><a href="/admin">관리자</a></li>
+                <li><a href="/boards/as">로그인</a></li>
+                <li><a href="/join">회원가입</a></li>
+            </ul>
+        </nav>
+    </header>
+</th:block>
 
+<h1 class="page-title">게시판</h1>
+
+<!-- 게시물 목록 테이블 -->
 <table class="board-table">
     <thead>
     <tr>
@@ -19,14 +36,85 @@
     </tr>
     </thead>
     <tbody>
-    <!-- boards 객체를 순회하면서 데이터를 출력 -->
-    <tr th:each="board : ${boards}">
-        <td th:text="${board.id}">1</td>
-        <td th:text="${board.title}">공지사항 제목</td>
-        <td th:text="${board.writer}">홍길동</td>
-        <td th:text="${#dates.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+    <!-- 게시물 목록 반복 -->
+    <tr th:each="board : ${boards}" class="board-row" th:data-board-id="${board.id}">
+        <td th:text="${board.id}"></td>
+        <td th:text="${board.title}" class="board-title"></td>
+        <td th:text="${board.writer}"></td>
+        <td th:text="${board.formattedCreatedDate}"></td>
     </tr>
     </tbody>
 </table>
+
+<!-- 게시물 내용이 표시될 부분 (초기에는 숨겨짐) -->
+<div id="boardDetail" style="display:none;">
+    <h3>게시물 내용</h3>
+    <p id="content"></p>
+    <button onclick="closeBoardDetail()">닫기</button>
+</div>
+
+<!-- 로딩 표시 -->
+<div id="loading" style="display:none;">게시물 내용을 불러오는 중...</div>
+
+<script>
+    // 게시물 제목 클릭 시 내용 로드하기
+    document.querySelectorAll('.board-row').forEach(row => {
+        row.addEventListener('click', function() {
+            const boardId = this.getAttribute('data-board-id'); // data-board-id에서 board ID 추출
+            loadBoardContent(boardId);  // 해당 ID로 게시물 내용 요청
+        });
+    });
+
+    // 게시물 내용 가져오기
+    function loadBoardContent(boardId) {
+        // 로딩 상태 표시
+        document.getElementById('loading').style.display = 'block';
+        // 게시물 내용 영역 숨기기
+        document.getElementById('boardDetail').style.display = 'none';
+
+        fetch(`/boards/${boardId}`)  // 서버로 해당 ID를 전달하여 게시물 내용 요청
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('게시물을 불러오는 데 실패했습니다.');
+                }
+                return response.json();  // 서버에서 JSON 응답을 받음
+            })
+            .then(data => {
+                // 응답이 있을 경우
+                if (data && data.content) {
+                    // 게시물 내용을 표시
+                    document.getElementById('content').innerText = data.content;
+                    // 게시물 내용 영역 보이기
+                    document.getElementById('boardDetail').style.display = 'block';
+                } else {
+                    console.error('게시물 내용이 없습니다.');
+                    alert('게시물 내용을 불러오는 데 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching board content:', error);
+                alert('게시물 내용을 불러오는 데 문제가 발생했습니다.');
+            })
+            .finally(() => {
+                // 로딩 상태 숨기기
+                document.getElementById('loading').style.display = 'none';
+            });
+    }
+
+    // 게시물 내용 영역 닫기
+    function closeBoardDetail() {
+        document.getElementById('boardDetail').style.display = 'none';
+    }
+</script>
+
+<!-- 푸터 포함 -->
+<th:block th:replace="~{fragment/footer::footer}"></th:block>
+<!-- 푸터 -->
+<th:block th:fragment="footer">
+    <footer class="footer">
+        <p>I hate Spring it's sooooooo hard....</p>
+    </footer>
+</th:block>
+
 </body>
 </html>

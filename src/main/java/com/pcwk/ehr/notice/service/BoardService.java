@@ -26,16 +26,16 @@ public class BoardService {
 
     // 모든 게시물 조회
     public List<Board> getAllBoards() {
-        return boardRepository.findAll();
+        return boardRepository.findAll();  // 데이터베이스에서 모든 게시물 가져오기
     }
 
     // 게시물 ID로 조회
     public Board getBoardById(Long id) {
-        return boardRepository.findById(id).orElse(null);
+        return boardRepository.findById(id).orElse(null);  // ID로 게시물 조회
     }
 
     // 게시물 삭제
     public void deleteBoard(Long id) {
-        boardRepository.deleteById(id);
+        boardRepository.deleteById(id);  // 게시물 삭제
     }
 }

@@ -3,53 +3,81 @@ package com.pcwk.ehr.notice.controller;
 import com.pcwk.ehr.notice.entity.Board;
 import com.pcwk.ehr.notice.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller; // @RestController 대신 @Controller 사용
-import org.springframework.ui.Model; // Model을 사용하여 데이터를 뷰로 전달
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Controller // REST API가 아닌 웹 페이지 컨트롤러로 지정
-@RequestMapping("/boards") // 웹 페이지의 URL 매핑
+@Controller
+@RequestMapping("/boards")  // "/boards"로 URL 패턴을 통일
 public class BoardController {
     private final BoardService boardService;
+
+    // 기본 URL (/에 대한 요청을 처리)
+    @GetMapping("/")
+    public String showIndex() {
+        return "index";  // index.html을 반환
+    }
+
+    // 기본 URL (/에 대한 요청을 처리)
+    @GetMapping("/as")
+    public String showMainPage() {
+        return "mainPage";  // index.html을 반환
+    }
+
 
     @Autowired
     public BoardController(BoardService boardService) {
         this.boardService = boardService;
     }
 
-
-    @RequestMapping("/as")  // /boards/as 경로로 GET 요청 처리
+    // 게시판 목록 페이지 보여주기
+    @GetMapping
     public String showBoards(Model model) {
-        // 예시로 LocalDateTime을 생성
-        LocalDateTime createdDate = LocalDateTime.now();
-
-        // DateTimeFormatter를 사용하여 날짜 포맷
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = createdDate.format(formatter);
-
-        // 포맷된 날짜를 모델에 추가
-        model.addAttribute("formattedDate", formattedDate);
-
-        return "showBoards";
+        List<Board> boards = boardService.getAllBoards(); // DB에서 게시물 목록을 가져옵니다.
+        model.addAttribute("boards", boards);  // 모델에 추가하여 Thymeleaf로 전달
+        return "showBoards";  // showBoards.html로 데이터 전송
     }
 
-    // 게시물 조회 (웹 페이지로 반환)
-    @GetMapping("/{id}")
-    public String getBoardById(@PathVariable Long id, Model model) {
-        Board board = boardService.getBoardById(id);  // 서비스에서 특정 게시물 가져옴
-        model.addAttribute("board", board);  // "board" 이름으로 뷰에 전달
-        return "boardDetail"; // boardDetail.html 페이지로 이동
+    // 게시물 상세 정보를 반환하는 API
+    @GetMapping("/{id}")  // URL을 "/boards/{id}"로 수정
+    public ResponseEntity<Map<String, Object>> getBoard(@PathVariable Long id) {
+        Board board = boardService.getBoardById(id);  // id를 Long으로 받음
+
+        if (board != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", board.getId());
+            response.put("title", board.getTitle());
+            response.put("content", board.getContent());
+            response.put("writer", board.getWriter());
+            response.put("formattedCreatedDate", board.getFormattedCreatedDate());
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
+
+//    // 게시물 조회 (웹 페이지로 반환)
+//    @GetMapping("/{id}")
+//    public String getBoardById(@PathVariable Long id, Model model) {
+//        Board board = boardService.getBoardById(id);  // 서비스에서 특정 게시물 가져옴
+//        model.addAttribute("board", board);  // "board" 이름으로 뷰에 전달
+//        return "boardDetail"; // boardDetail.html 페이지로 이동
+//    }
 
     // 게시물 생성 (웹 페이지에서 게시물 추가)
     @PostMapping
     public String createBoard(@ModelAttribute Board board) {
         boardService.saveBoard(board);  // 서비스에서 게시물 저장
-        return "redirect:/boards";  // 게시물 저장 후 게시판 목록 페이지로 리다이렉트
+        // 게시물 저장 후 게시판 목록 페이지로 리다이렉트
+        return "redirect:/boards";
     }
 
     // 게시물 삭제
